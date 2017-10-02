@@ -54,7 +54,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         holder.textViewLogin.setText(repository.owner.login);
         Glide.with(context)
                 .load(repository.owner.avatarUrl)
-                .apply(RequestOptions.circleCropTransform())
+                .apply(RequestOptions.circleCropTransform())  //Crop sobre a imagem
                 .into(holder.imageView);
 
 
