@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
             View view = error.getView();
             String message = error.getCollatedErrorMessage(this);
 
-            // Display error messages ;)
+            // Display error messages
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {
