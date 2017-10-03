@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity{
     @BindView(R.id.edittext)
     EditText editText;
 
-    Validator validator = new Validator(this);
     RepositoryInterface repositoryInterface ;
 
     @BindView(R.id.rv)
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity{
     Repositories repositories;
     CardAdapter adapter;
     Call<Repositories> call;
-    long DELAY = 1000;
+    long DELAY = 500;
 
     final android.os.Handler handler = new android.os.Handler();
 
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
-
 
 
         adapter = new CardAdapter(repositories);
@@ -103,7 +101,6 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //validator.validate();
 
                 rv.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
@@ -122,7 +119,6 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
-
 
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
