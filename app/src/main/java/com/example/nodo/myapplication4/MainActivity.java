@@ -1,6 +1,8 @@
 package com.example.nodo.myapplication4;
 
 import android.content.Context;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -46,32 +48,10 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity{
 
-    @BindView(R.id.button_search)
-    Button buttonSearch;
+    @BindView(R.id.view_pager)
+    ViewPager vpPager;
 
-    @BindView(R.id.loading)
-    ProgressBar progressBar;
-
-    @BindView(R.id.imageView)
-    ImageView imageView;
-
-    @BindView(R.id.textview)
-    TextView textView;
-
-    @NotEmpty
-    @BindView(R.id.edittext)
-    EditText editText;
-
-    @BindView(R.id.rv)
-    RecyclerView rv;
-
-    @Inject
-    RepositoryInterface repositoryInterface ;
-
-
-    List<Repository> items = new ArrayList<>();
-
-    CardAdapter adapter;
+    FragmentPagerAdapter adapterViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,85 +61,9 @@ public class MainActivity extends AppCompatActivity{
         ((MyApplication) getApplication()).getNetComponent().inject(this);
         ButterKnife.bind(this);
 
-        adapter = new CardAdapter(items);
-        rv.setAdapter(adapter);
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
 
-
-        RxTextView.textChanges(editText)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(text -> {
-                    if (TextUtils.isEmpty(text)) {
-                        showEmptyState();
-                        return Observable.empty();
-                    }
-
-                    showLoading();
-                    return repositoryInterface.getRepos(text.toString())
-                            .onErrorResumeNext(Observable.empty())
-                            .flatMapIterable(l -> l.items)
-                            .toSortedList((a, b) ->
-                                    a.owner.login.compareTo(b.owner.login)
-                            )
-                            .toObservable()
-                            .subscribeOn(Schedulers.io());
-
-                })
-
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        data -> {
-                            hideLoading();
-                            adapter.repositories = data;
-                            adapter.notifyDataSetChanged();
-                        },
-                        throwable -> {
-                            throwable.printStackTrace();
-                        });
-
-        editText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                //onClickSearch();
-                return true;
-            }
-            return false;
-        });
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        rv.setLayoutManager(layoutManager);
-        rv.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-    }
-
-    private void showEmptyState() {
-        imageView.setVisibility(View.VISIBLE);
-        textView.setVisibility(View.VISIBLE);
-        rv.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
-    }
-
-    private void showLoading() {
-        rv.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-        imageView.setVisibility(View.GONE);
-        textView.setVisibility(View.GONE);
-        closeInput(editText);
-    }
-
-    private void hideLoading() {
-        progressBar.setVisibility(View.GONE);
-        rv.setVisibility(View.VISIBLE);
-    }
-
-    public void closeInput(final View caller) {
-        if (caller == null)
-            return;
-
-        caller.postDelayed(() -> {
-            InputMethodManager imm = (InputMethodManager) caller.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(caller.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-        }, 100);
     }
 
 }

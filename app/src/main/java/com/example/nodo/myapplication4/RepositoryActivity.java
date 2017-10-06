@@ -73,4 +73,5 @@ public class RepositoryActivity extends AppCompatActivity {
         compositeDisposable.clear();
         super.onDestroy();
     }
+
 }
