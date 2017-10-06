@@ -81,7 +81,6 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View  view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        Context context = getContext();
         adapter = new CardAdapter(items);
         rv.setAdapter(adapter);
 
@@ -119,9 +118,9 @@ public class SearchFragment extends Fragment {
                         });
 
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rv.setLayoutManager(layoutManager);
-        rv.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
+        rv.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
         return view;
 
