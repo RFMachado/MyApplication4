@@ -28,10 +28,10 @@ import butterknife.ButterKnife;
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
 
-    public Repositories repositories;
+    public List<Repository> repositories;
 
 
-    public CardAdapter(Repositories repositories) {
+    public CardAdapter(List<Repository> repositories) {
         this.repositories = repositories ;
     }
 
@@ -48,7 +48,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Context context = holder.itemView.getContext();
-        final Repository repository = repositories.items.get(position);
+        final Repository repository = repositories.get(position);
 
         holder.textViewId.setText(repository.owner.id);
         holder.textViewLogin.setText(repository.owner.login);
@@ -74,7 +74,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return repositories.items.size();
+        return repositories.size();
     }
 
 

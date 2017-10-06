@@ -8,11 +8,18 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.nodo.myapplication4.entities.Download;
-import com.example.nodo.myapplication4.entities.Repositories;
 import com.example.nodo.myapplication4.entities.Repository;
+
+import java.util.Observable;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,6 +27,7 @@ import us.feras.mdv.MarkdownView;
 
 public class RepositoryActivity extends AppCompatActivity {
 
+    @Inject
     RepositoryInterface repositoryInterface;
 
     @BindView(R.id.mark_down)
@@ -28,46 +36,41 @@ public class RepositoryActivity extends AppCompatActivity {
     @BindView(R.id.progress_bar_md)
     ProgressBar progressBar;
 
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repository);
-        ButterKnife.bind(this);
 
+        ((MyApplication) getApplication()).getNetComponent().inject(this);
+        ButterKnife.bind(this);
         Repository repository = (Repository) getIntent().getSerializableExtra("download");
 
-        repositoryInterface = RepositoryApi.conect();
+        Disposable disposable = repositoryInterface
+                .getDownload(repository.owner.login,repository.name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(data -> {
 
-        Call<Download> call = repositoryInterface.getDownload(repository.owner.login,repository.name);
+                            Download download = data;
+                            markdownView.loadMarkdownFile(download.urldonwload);
+                            progressBar.setVisibility(View.GONE);
+                            markdownView.setVisibility(View.VISIBLE);
 
-        call.enqueue(new Callback<Download>() {
+                        },
+                        throwable -> {
+                            Toast.makeText(RepositoryActivity.this,"No text",Toast.LENGTH_SHORT).show();
+                            finish();
+                            throwable.printStackTrace();
+                        });
 
-            @Override
-            public void onResponse(Call<Download> call, Response<Download> response) {
-
-                if(response.isSuccessful()){
-
-                    Download download = response.body();
-                    markdownView.loadMarkdownFile(download.urldonwload);
-                    progressBar.setVisibility(View.GONE);
-                    markdownView.setVisibility(View.VISIBLE);
-
-                }else{
-
-                    Toast.makeText(RepositoryActivity.this,"No text",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(RepositoryActivity.this, MainActivity.class);
-                    startActivity(intent);
-
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<Download> call, Throwable t) {
-                Toast.makeText(RepositoryActivity.this,"Connection Fail",Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        compositeDisposable.add(disposable);
     }
 
+    @Override
+    protected void onDestroy() {
+        compositeDisposable.clear();
+        super.onDestroy();
+    }
 }

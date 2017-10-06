@@ -6,6 +6,7 @@ import com.example.nodo.myapplication4.entities.Repository;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -18,10 +19,10 @@ import retrofit2.http.Query;
 public interface RepositoryInterface {
 
     @GET("search/repositories")
-    Call<Repositories> getRepos(@Query("q") String sort);
+    Observable<Repositories> getRepos(@Query("q") String sort);
 
     @GET("repos/{first}/{second}/readme")
-    Call<Download> getDownload(@Path("first") String first, @Path("second") String second);
+    Observable<Download> getDownload(@Path("first") String first, @Path("second") String second);
 
 }
 

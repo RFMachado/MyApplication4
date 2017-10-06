@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by nodo on 28/09/17.
  */
 
-public class Repository implements Serializable{
+public class Repository implements Serializable {
 
     @SerializedName("name")
     public String name;
